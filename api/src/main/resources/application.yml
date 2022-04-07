@@ -1,0 +1,49 @@
+server:
+  port: 6069
+
+spring:
+  application:
+    name: file-uploader
+
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
+
+  mvc:
+    servlet:
+      path: /api
+  datasource:
+    url: jdbc:h2:mem:dndfileupload
+#    url: jdbc:h2:file:~/DEV/esg-workspace/h2-db/esgdb;AUTO_SERVER=TRUE
+    username: sa
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        hbm2ddl:
+          import_files_sql_extractor: org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor
+
+
+upload:
+  directory: build/upload
+
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: ERROR
+        jdbc: ERROR
+      hibernate:
+        stat: DEBUG
+        type.descriptor.sql: TRACE
+    com.blackpet.dndfileupload: DEBUG
