@@ -10,6 +10,7 @@ import FileIcon from './components/FileIcon.vue';
 const title1 = ref<string>()
 const files1 = ref<Array<AttachFile>>()
 const fileBoardList = ref<Array<FileBoardResponse>>()
+const apiPath = import.meta.env.VITE_API_PATH;
 
 onMounted(() => {
   loadFileBoardList();
@@ -55,7 +56,9 @@ async function save() {
         {{board.title}}
         <ul class="board-files">
           <li v-for="file in board.files" :key="file.id">
-            <FileIcon :mime="(file.contentType as MimeTypeString)" /> [{{file.contentType}}] [{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
+            <a :href="`${apiPath}/files/download/${file.id}`" :download="file.originFilename">
+              <FileIcon :mime="(file.contentType as MimeTypeString)" /> [{{file.contentType}}] [{{file.id}}] <strong>{{file.originFilename}}</strong> ({{bytesToSize(file.size)}})
+            </a>
           </li>
         </ul>
       </li>

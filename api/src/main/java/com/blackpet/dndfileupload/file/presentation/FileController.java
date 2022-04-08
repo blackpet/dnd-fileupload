@@ -5,19 +5,21 @@ import com.blackpet.dndfileupload.file.infrastructure.FileRepository;
 import com.blackpet.dndfileupload.file.infrastructure.dto.FileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,6 +51,21 @@ public class FileController {
 
     return ResponseEntity.ok(response);
   }
+
+  @GetMapping("/files/download/{id}")
+  public void downloadFile(@PathVariable UUID id, HttpServletResponse response) throws IOException {
+    AttachFile file = fileRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("첨부되지 않은 파일입니다."));
+
+    file.verifyDownload();
+
+    InputStream inputStream = new FileInputStream(file.getFilePath().toFile());
+
+    response.setContentType(file.getContentType());
+    response.setHeader("Content-disposition", "attachment; filename="+ file.getOriginFilename());
+    IOUtils.copy(inputStream, response.getOutputStream());
+  }
+
 
   private void copyFileToPath(InputStream inputStream, AttachFile file) {
     Path target = file.getFilePath();
