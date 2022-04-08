@@ -2,7 +2,7 @@ package com.blackpet.dndfileupload.file.presentation;
 
 import com.blackpet.dndfileupload.file.domain.AttachFile;
 import com.blackpet.dndfileupload.file.infrastructure.FileRepository;
-import com.blackpet.dndfileupload.file.infrastructure.dto.FileResponse;
+import com.blackpet.dndfileupload.file.infrastructure.dto.AttachFileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -13,9 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class FileController {
   private final FileRepository fileRepository;
 
   @PostMapping("/files/upload")
-  public ResponseEntity<FileResponse> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+  public ResponseEntity<AttachFileResponse> uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
 
     Path targetDirectory = Paths.get(uploadDirectory);
 
@@ -44,7 +45,7 @@ public class FileController {
     // save to DB
     fileRepository.save(attachFile);
 
-    FileResponse response = FileResponse.builder()
+    AttachFileResponse response = AttachFileResponse.builder()
             .id(attachFile.getId())
             .originFilename(attachFile.getOriginFilename())
             .build();
@@ -62,8 +63,20 @@ public class FileController {
     InputStream inputStream = new FileInputStream(file.getFilePath().toFile());
 
     response.setContentType(file.getContentType());
-    response.setHeader("Content-disposition", "attachment; filename="+ file.getOriginFilename());
+    response.setHeader("Content-disposition", "attachment; filename="
+            + new String(file.getOriginFilename().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
     IOUtils.copy(inputStream, response.getOutputStream());
+  }
+
+  @DeleteMapping("/files/{id}")
+  public ResponseEntity<Boolean> deleteFile(@PathVariable UUID id) throws IOException {
+    AttachFile file = fileRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("존재하지 않는 파일입니다."));
+
+    fileRepository.delete(file);
+    Files.delete(file.getFilePath());
+
+    return ResponseEntity.ok(true);
   }
 
 

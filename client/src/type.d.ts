@@ -1,14 +1,26 @@
 export type UUID = string
 
-export interface FileResponse {
+export interface AttachFileResponse {
   id: UUID
   originFilename: string
+  contentType?: string
+  size?: number
+  attached?: boolean
+}
+
+export interface FileBoardAttachmentResponse {
+  attachmentId: UUID
+  fileId: UUID
+  originFilename: string
+  contentType?: string
+  size?: number
+  attached?: boolean
 }
 
 export interface FileBoardResponse {
   id: UUID
   title: string
-  files: Array<AttachFile>
+  attachments: Array<FileBoardAttachmentResponse>
 }
 
 export interface AttachFile extends File {
