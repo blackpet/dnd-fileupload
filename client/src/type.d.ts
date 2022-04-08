@@ -16,6 +16,7 @@ export interface AttachFile extends File {
   originFilename: string
   contentType: string
   size: number
+  attached: boolean
 }
 
 export interface CreateFileBoardRequest {
