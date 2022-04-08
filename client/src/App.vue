@@ -2,11 +2,21 @@
 import DndFileUploader from './components/DndFileUploader.vue';
 import {ref, watch} from 'vue';
 import {AttachedFile} from './type';
+import {createAttachBoard} from './lib/api/attachboard-api';
 
 const title1 = ref<string>()
 const files1 = ref<Array<AttachedFile>>()
 
 watch(files1, (value => console.log('watch', value)))
+
+async function save() {
+  const request = {
+    title: title1.value!,
+    fileIds: files1.value!.map(f => f.id)
+  }
+  const id = await createAttachBoard(request)
+  console.log('new board created', id);
+}
 </script>
 
 <template>
@@ -14,8 +24,8 @@ watch(files1, (value => console.log('watch', value)))
 
   <h3 class="section">Attach Board</h3>
   <div>
-    <input type="text" v-model="title1" placeholder="첨부 제목을 입력해주세요.">
-    <button>Save</button>
+    <input type="text" class="board-title" v-model="title1" placeholder="첨부 제목을 입력해주세요.">
+    <button @click="save" :disabled="!title1 || !files1?.length">Save</button>
   </div>
   <DndFileUploader class="dnd" v-model:files="files1" />
   <p>Any file uploader</p>
@@ -31,6 +41,7 @@ watch(files1, (value => console.log('watch', value)))
 .dnd {
   margin: 0 1rem;
 }
+.board-title {width: 40vw; margin-right: 1rem;}
 input {height: 2rem; padding: 5px;}
 h3.section {margin-top: 2rem;}
 #app {

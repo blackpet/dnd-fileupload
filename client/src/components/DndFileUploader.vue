@@ -4,7 +4,7 @@ import {ref} from 'vue';
 import {bytesToSize} from '../lib/util/size-converter';
 import FileIcon from './FileIcon.vue';
 import {uploadFile} from '../lib/api/file-api';
-import type {AttachedFile, FileResponse} from '../type';
+import type {AttachedFile, FileResponse, HTMLInputEvent} from '../type';
 
 interface DndFileUploaderProps {
   accept?: string
@@ -42,6 +42,14 @@ function dropFile(e: DragEvent) {
   const files = Array.from(fileList).filter(f => validateAccept(f.type))
 
   addFiles(files);
+}
+
+function handleInputFileChange(e: HTMLInputEvent) {
+  const fileList = e.target?.files;
+
+  if (fileList) {
+    addFiles(Array.from(fileList));
+  }
 }
 
 function validateAccept(type: string) {
@@ -108,14 +116,14 @@ function removeFile(name: string) {
   >
     <form class="dnd-form">
       <p class="dnd-placeholder">{{placeholder || 'Drag & Drop Files here'}}</p>
-      <input type="file" multiple :id="`fileInput-${randomId}`" :accept="props.accept" @change="(e) => addFiles(e.target.files)">
+      <input type="file" multiple :id="`fileInput-${randomId}`" :accept="props.accept" @change="handleInputFileChange">
       <label class="button" :for="`fileInput-${randomId}`">Select some files</label>
     </form>
 
     <ul class="file-list">
       <li v-for="[name, file] of attachedFiles" :key="name" class="file-list-item">
         <template v-if="file.attached">
-          <FileIcon :mime="file.type" /> @[{{file.type}}] #[{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
+          <FileIcon :mime="file.type" /> [{{file.type}}] [{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
           <HandleX size="18" fill="#ff4f4f" @click="removeFile(name)" />
         </template>
       </li>
