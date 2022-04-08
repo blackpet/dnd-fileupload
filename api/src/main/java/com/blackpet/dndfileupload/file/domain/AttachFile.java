@@ -50,4 +50,10 @@ public class AttachFile extends BaseAuditingTimeEntity<AttachFile> {
     if (this.attached) throw new RuntimeException("이미 첨부된 파일입니다. id=" + this.id);
     this.attached = true;
   }
+
+  public void verifyDownload() {
+    if (!this.attached) {
+      throw new RuntimeException("첨부되지 않은 파일입니다.");
+    }
+  }
 }

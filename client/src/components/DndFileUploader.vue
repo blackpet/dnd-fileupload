@@ -45,8 +45,9 @@ function dropFile(e: DragEvent) {
   addFiles(files);
 }
 
-function handleInputFileChange(e: HTMLInputEvent) {
-  const fileList = e.target?.files;
+function handleInputFileChange(e: Event) {
+  const inputEvent = e as HTMLInputEvent
+  const fileList = inputEvent.target?.files;
 
   if (fileList) {
     addFiles(Array.from(fileList));
@@ -68,7 +69,7 @@ async function addFiles(files: Array<File>) {
   files.forEach(f => {
     // upload to server!
     promises.push(uploadFile(f));
-    attachedFiles.value.set(f.name, f)
+    attachedFiles.value.set(f.name, f as AttachFile)
   })
 
   // Promise 는 일괄 처리 하자!
@@ -117,7 +118,7 @@ function removeFile(name: string) {
   >
     <form class="dnd-form">
       <p class="dnd-placeholder">{{placeholder || 'Drag & Drop Files here'}}</p>
-      <input type="file" multiple :id="`fileInput-${randomId}`" :accept="props.accept" @change="handleInputFileChange">
+      <input type="file" multiple :id="`fileInput-${randomId}`" :accept="props.accept" @change="e => handleInputFileChange(e)">
       <label class="button" :for="`fileInput-${randomId}`">Select some files</label>
     </form>
 

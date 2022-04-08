@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import type {MimeTypeString} from './lib/util/mime-type';
 import {bytesToSize} from './lib/util/size-converter';
 import DndFileUploader from './components/DndFileUploader.vue';
 import {onMounted, ref, watch} from 'vue';
-import {FileBoardResponse, AttachFile} from './type';
+import {FileBoardResponse, AttachFile, UUID} from './type';
 import {createFileBoard, getFileBoardList} from './lib/api/attachboard-api';
 import FileIcon from './components/FileIcon.vue';
 
 const title1 = ref<string>()
 const files1 = ref<Array<AttachFile>>()
 const fileBoardList = ref<Array<FileBoardResponse>>()
+const apiPath = import.meta.env.VITE_API_PATH;
 
 onMounted(() => {
   loadFileBoardList();
@@ -23,7 +25,7 @@ async function loadFileBoardList() {
 async function save() {
   const request = {
     title: title1.value!,
-    fileIds: files1.value!.map(f => f.id)
+    fileIds: files1.value!.map(f => f.id) as Array<UUID>
   }
   const id = await createFileBoard(request)
   console.log('new board created', id);
@@ -54,7 +56,9 @@ async function save() {
         {{board.title}}
         <ul class="board-files">
           <li v-for="file in board.files" :key="file.id">
-            <FileIcon :mime="(file.contentType as MimeTypeString)" /> [{{file.contentType}}] [{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
+            <a :href="`${apiPath}/files/download/${file.id}`" :download="file.originFilename">
+              <FileIcon :mime="(file.contentType as MimeTypeString)" /> [{{file.contentType}}] [{{file.id}}] <strong>{{file.originFilename}}</strong> ({{bytesToSize(file.size)}})
+            </a>
           </li>
         </ul>
       </li>

@@ -10,4 +10,5 @@ public class AttachedFileResponse {
   private String originFilename;
   private String contentType;
   private long size;
+  private boolean attached;
 }
