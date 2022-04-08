@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import {HandleX} from '@icon-park/vue-next';
-import {ref} from 'vue';
+import {onMounted, ref, watchEffect} from 'vue';
 import {bytesToSize} from '../lib/util/size-converter';
 import FileIcon from './FileIcon.vue';
 import {uploadFile} from '../lib/api/file-api';
-import type {AttachFile, FileResponse, HTMLInputEvent} from '../type';
+import type {AttachFile, AttachFileResponse, HTMLInputEvent} from '../type';
 import type {MimeTypeString} from '../lib/util/mime-type';
 
 interface DndFileUploaderProps {
   accept?: string
   placeholder?: string
+  modelValue: Array<AttachFile>
 }
 enum UPLOAD_STATE {
   READY = 0,
@@ -17,15 +18,23 @@ enum UPLOAD_STATE {
 }
 const props = defineProps<DndFileUploaderProps>()
 const emits = defineEmits<{
-  (e: 'update:files', value: Array<AttachFile>): void
+  (e: 'update:modelValue', value: Array<AttachFile>): void
 }>()
+onMounted(() => {
+  console.log('onMounted props', props)
+})
 
 const container = ref<HTMLDivElement>()
 const attachedFiles = ref<Map<string, AttachFile>>(new Map())
 const isHighlight = ref<boolean>(false)
 const currentState = ref<UPLOAD_STATE>()
-
+// const attachedFiles = computed(() => !props.modelValue ? new Map() : new Map(props.modelValue.map(f => [f.originFilename, f])))
 const randomId = Math.random().toString(36).substring(2, 18);
+
+watchEffect( () => {
+  attachedFiles.value = !props.modelValue ? new Map() : new Map(props.modelValue.map(f => [f.name, f]))
+})
+
 
 const highlight = () => isHighlight.value = true
 const unhighlight = () => isHighlight.value = false
@@ -65,7 +74,7 @@ async function addFiles(files: Array<File>) {
   // state to uploading...
   currentState.value = UPLOAD_STATE.UPLOADING
 
-  const promises: Array<Promise<FileResponse>> = []
+  const promises: Array<Promise<AttachFileResponse>> = []
   files.forEach(f => {
     // upload to server!
     promises.push(uploadFile(f));
@@ -75,7 +84,7 @@ async function addFiles(files: Array<File>) {
   // Promise 는 일괄 처리 하자!
   const responses = await Promise.allSettled(promises)
 
-  responses.forEach((res: PromiseSettledResult<FileResponse>) => {
+  responses.forEach((res: PromiseSettledResult<AttachFileResponse>) => {
     // 업로드 된 파일이면 list 에 추가하자!
     if (res.status === 'fulfilled') {
       const file = attachedFiles.value.get(res.value.originFilename);
@@ -96,14 +105,14 @@ async function addFiles(files: Array<File>) {
   currentState.value = UPLOAD_STATE.READY
 
   // emit
-  emits('update:files', [...attachedFiles.value.values()])
+  emits('update:modelValue', [...attachedFiles.value.values()])
 }
 
 function removeFile(name: string) {
   attachedFiles.value.delete(name)
 
   // emit
-  emits('update:files', [...attachedFiles.value.values()])
+  emits('update:modelValue', [...attachedFiles.value.values()])
 }
 
 </script>
@@ -125,7 +134,7 @@ function removeFile(name: string) {
     <ul class="file-list">
       <li v-for="[name, file] of attachedFiles" :key="name" class="file-list-item">
         <template v-if="file.attached">
-          <FileIcon :mime="(file.type as MimeTypeString)" /> [{{file.type}}] [{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
+          <FileIcon :mime="(file.type as MimeTypeString)" /> <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
           <HandleX size="18" fill="#ff4f4f" @click="removeFile(name)" />
         </template>
       </li>

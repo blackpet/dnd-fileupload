@@ -1,8 +1,8 @@
 package com.blackpet.dndfileupload.board.domain;
 
+import com.blackpet.dndfileupload.board.infrastructure.dto.FileBoardAttachmentResponse;
 import com.blackpet.dndfileupload.common.entity.BaseAuditingTimeEntity;
 import com.blackpet.dndfileupload.file.domain.AttachFile;
-import com.blackpet.dndfileupload.file.infrastructure.dto.AttachedFileResponse;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -38,15 +38,18 @@ public class FileBoard extends BaseAuditingTimeEntity<FileBoard> {
   }
 
   /**
-   * 유효한(첨부완료된) 파일만 포함한 목록
+   * 유효한(첨부완료된) 파일만 포함한 Attachment 목록
    * @return
    */
-  public List<AttachedFileResponse> getAttachedFileResponseList() {
+  public List<FileBoardAttachmentResponse> getFileBoardAttachmentResponseList() {
     return attachments.stream()
-            .filter(att -> att.getFile().isAttached())
+            .filter(att -> att.getFile().isAttached()) // attached == true 만 뽑자!
             .map(att -> {
-              AttachedFileResponse res = new AttachedFileResponse();
+              FileBoardAttachmentResponse res = new FileBoardAttachmentResponse();
               BeanUtils.copyProperties(att.getFile(), res);
+              res.setAttachmentId(att.getId());
+              res.setFileId(att.getFile().getId());
+
               return res;
             })
             .collect(Collectors.toList());

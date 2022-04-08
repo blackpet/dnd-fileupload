@@ -42,7 +42,7 @@ public class FileBoardService {
       FileBoardResponse boardResponse = new FileBoardResponse();
       BeanUtils.copyProperties(attachBoard, boardResponse);
       // exclude non attached file
-      boardResponse.setFiles(attachBoard.getAttachedFileResponseList());
+      boardResponse.setAttachments(attachBoard.getFileBoardAttachmentResponseList());
       return boardResponse;
     }).collect(Collectors.toList());
   }

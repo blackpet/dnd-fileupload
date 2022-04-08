@@ -4,13 +4,15 @@ import {bytesToSize} from './lib/util/size-converter';
 import DndFileUploader from './components/DndFileUploader.vue';
 import {onMounted, ref, watch} from 'vue';
 import {FileBoardResponse, AttachFile, UUID} from './type';
-import {createFileBoard, getFileBoardList} from './lib/api/attachboard-api';
+import {createFileBoard, getFileBoardList} from './lib/api/fileboard-api';
 import FileIcon from './components/FileIcon.vue';
 
 const title1 = ref<string>()
-const files1 = ref<Array<AttachFile>>()
+const files1 = ref<Array<AttachFile>>([])
 const fileBoardList = ref<Array<FileBoardResponse>>()
 const apiPath = import.meta.env.VITE_API_PATH;
+
+const files2 = ref<Array<AttachFile>>([])
 
 onMounted(() => {
   loadFileBoardList();
@@ -44,7 +46,7 @@ async function save() {
       <input type="text" class="board-title" v-model="title1" placeholder="첨부 제목을 입력해주세요.">
       <button @click="save" :disabled="!title1 || !files1?.length">Save</button>
     </div>
-    <DndFileUploader class="dnd" v-model:files="files1" />
+    <DndFileUploader class="dnd" v-model="files1" />
     <p>Any file uploader</p>
 
     <h3 class="section">File Board List</h3>
@@ -55,9 +57,9 @@ async function save() {
       <li v-for="board in fileBoardList" :key="board.id" class="board-item">
         {{board.title}}
         <ul class="board-files">
-          <li v-for="file in board.files" :key="file.id">
-            <a :href="`${apiPath}/files/download/${file.id}`" :download="file.originFilename">
-              <FileIcon :mime="(file.contentType as MimeTypeString)" /> [{{file.contentType}}] [{{file.id}}] <strong>{{file.originFilename}}</strong> ({{bytesToSize(file.size)}})
+          <li v-for="att in board.attachments" :key="att.id">
+            <a :href="`${apiPath}/files/download/${att.fileId}`" :download="att.originFilename">
+              <FileIcon :mime="(att.contentType as MimeTypeString)" /> [{{att.contentType}}] [{{att.fileId}}] <strong>{{att.originFilename}}</strong> ({{bytesToSize(att.size)}})
             </a>
           </li>
         </ul>
@@ -67,7 +69,7 @@ async function save() {
 
   <section class="separator">
     <h3 class="section">image file uploader (accept="image/*")</h3>
-    <DndFileUploader class="dnd" accept="image/*" placeholder="이미지 파일을 여기에 Drag & Drop 해 주세요" />
+    <DndFileUploader class="dnd" v-model="files2" accept="image/*" placeholder="이미지 파일을 여기에 Drag & Drop 해 주세요" />
     <p>image file uploader (accept="image/*")</p>
   </section>
 

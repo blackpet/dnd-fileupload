@@ -22,7 +22,7 @@ public class FileBoardAttachment extends BaseAuditingTimeEntity<FileBoardAttachm
   @JoinColumn(name = "file_board_id")
   private FileBoard fileBoard;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "file_id")
   private AttachFile file;
 
