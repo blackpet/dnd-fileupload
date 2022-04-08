@@ -5,7 +5,7 @@ import {mimeTypeIconMap} from '../lib/util/mime-type';
 
 
 interface FileIconProps {
-  mime: string
+  mime: MimeTypeString
   color?: string
   size?: number
 }

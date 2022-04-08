@@ -1,7 +1,7 @@
-import type {AttachedFile, FileResponse} from '../../type';
+import type {AttachFile, FileResponse} from '../../type';
 import {api} from '../http/http-helper';
 
-async function uploadFile(file: AttachedFile): Promise<FileResponse> {
+async function uploadFile(file: AttachFile): Promise<FileResponse> {
   if (!file) throw new Error(`file does not exists`)
 
   const formData = new FormData()

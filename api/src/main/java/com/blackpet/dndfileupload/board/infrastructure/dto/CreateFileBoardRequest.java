@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class CreateAttachBoardRequest {
+public class CreateFileBoardRequest {
   private String title;
   private List<UUID> fileIds;
 }
