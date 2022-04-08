@@ -1,9 +1,9 @@
 package com.blackpet.dndfileupload.board.application;
 
-import com.blackpet.dndfileupload.board.domain.AttachBoard;
-import com.blackpet.dndfileupload.board.infrastructure.AttachBoardRepository;
-import com.blackpet.dndfileupload.board.infrastructure.dto.CreateAttachBoardRequest;
-import com.blackpet.dndfileupload.file.domain.AttachedFile;
+import com.blackpet.dndfileupload.board.domain.FileBoard;
+import com.blackpet.dndfileupload.board.infrastructure.FileBoardRepository;
+import com.blackpet.dndfileupload.board.infrastructure.dto.CreateFileBoardRequest;
+import com.blackpet.dndfileupload.file.domain.AttachFile;
 import com.blackpet.dndfileupload.file.infrastructure.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class AttachBoardServiceTest {
+class FileBoardServiceTest {
 
-  private List<AttachedFile> files = new ArrayList<>();
+  private List<AttachFile> files = new ArrayList<>();
 
   @Value("${upload.directory}")
   private String uploadDirectory;
@@ -32,16 +32,16 @@ class AttachBoardServiceTest {
   @Autowired
   private FileRepository fileRepository;
   @Autowired
-  private AttachBoardRepository attachBoardRepository;
+  private FileBoardRepository fileBoardRepository;
   @Autowired
-  private AttachBoardService attachBoardService;
+  private FileBoardService fileBoardService;
 
   @BeforeEach
   void setUp() {
     Path targetDirectory = Paths.get(uploadDirectory);
-    files.add(new AttachedFile("aaa", "image/jpg", 100, targetDirectory));
-    files.add(new AttachedFile("bbb", "application/xlsx", 200, targetDirectory));
-    files.add(new AttachedFile("ccc", "application/hwp", 300, targetDirectory));
+    files.add(new AttachFile("aaa", "image/jpg", 100, targetDirectory));
+    files.add(new AttachFile("bbb", "application/xlsx", 200, targetDirectory));
+    files.add(new AttachFile("ccc", "application/hwp", 300, targetDirectory));
 
     fileRepository.saveAll(files);
   }
@@ -51,16 +51,16 @@ class AttachBoardServiceTest {
   void create() {
     //given
     String title = "첨부파일들 1";
-    List<UUID> fileIds = files.stream().map(AttachedFile::getId).collect(Collectors.toList());
-    CreateAttachBoardRequest request = CreateAttachBoardRequest.builder()
+    List<UUID> fileIds = files.stream().map(AttachFile::getId).collect(Collectors.toList());
+    CreateFileBoardRequest request = CreateFileBoardRequest.builder()
             .title(title)
             .fileIds(fileIds)
             .build();
 
-    UUID newId = attachBoardService.create(request);
+    UUID newId = fileBoardService.create(request);
 
     //when
-    AttachBoard board = attachBoardRepository.findById(newId).orElseThrow();
+    FileBoard board = fileBoardRepository.findById(newId).orElseThrow();
 
     //then
     assertAll(

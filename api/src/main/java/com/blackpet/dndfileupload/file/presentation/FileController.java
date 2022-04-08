@@ -1,6 +1,6 @@
 package com.blackpet.dndfileupload.file.presentation;
 
-import com.blackpet.dndfileupload.file.domain.AttachedFile;
+import com.blackpet.dndfileupload.file.domain.AttachFile;
 import com.blackpet.dndfileupload.file.infrastructure.FileRepository;
 import com.blackpet.dndfileupload.file.infrastructure.dto.FileResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,23 +34,23 @@ public class FileController {
 
     Path targetDirectory = Paths.get(uploadDirectory);
 
-    AttachedFile attachedFile = new AttachedFile(file.getOriginalFilename(), file.getContentType(), file.getSize(), targetDirectory);
+    AttachFile attachFile = new AttachFile(file.getOriginalFilename(), file.getContentType(), file.getSize(), targetDirectory);
 
     // copy physical file
-    copyFileToPath(file.getInputStream(), attachedFile);
+    copyFileToPath(file.getInputStream(), attachFile);
 
     // save to DB
-    fileRepository.save(attachedFile);
+    fileRepository.save(attachFile);
 
     FileResponse response = FileResponse.builder()
-            .id(attachedFile.getId())
-            .originFilename(attachedFile.getOriginFilename())
+            .id(attachFile.getId())
+            .originFilename(attachFile.getOriginFilename())
             .build();
 
     return ResponseEntity.ok(response);
   }
 
-  private void copyFileToPath(InputStream inputStream, AttachedFile file) {
+  private void copyFileToPath(InputStream inputStream, AttachFile file) {
     Path target = file.getFilePath();
 
     try (inputStream) {

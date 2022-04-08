@@ -15,7 +15,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @NoArgsConstructor
-public class AttachedFile extends BaseAuditingTimeEntity<AttachedFile> {
+public class AttachFile extends BaseAuditingTimeEntity<AttachFile> {
   @Id
   private UUID id;
 
@@ -25,7 +25,7 @@ public class AttachedFile extends BaseAuditingTimeEntity<AttachedFile> {
   private String path;
   private boolean attached;
 
-  public AttachedFile(String originFilename, String contentType, long size, Path uploadDirectory) {
+  public AttachFile(String originFilename, String contentType, long size, Path uploadDirectory) {
     this.id = UUID.randomUUID();
     this.originFilename = originFilename;
     this.contentType = contentType;

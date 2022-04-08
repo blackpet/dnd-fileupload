@@ -5,12 +5,20 @@ export interface FileResponse {
   originFilename: string
 }
 
-export interface AttachedFile extends File {
-  id?: UUID
-  attached?: boolean
+export interface FileBoardResponse {
+  id: UUID
+  title: string
+  files: Array<AttachFile>
 }
 
-export interface CreateAttachBoardRequest {
+export interface AttachFile extends File {
+  id?: UUID
+  originFilename: string
+  contentType: string
+  size: number
+}
+
+export interface CreateFileBoardRequest {
   title: string
   fileIds: Array<UUID>
 }

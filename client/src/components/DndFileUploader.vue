@@ -4,7 +4,8 @@ import {ref} from 'vue';
 import {bytesToSize} from '../lib/util/size-converter';
 import FileIcon from './FileIcon.vue';
 import {uploadFile} from '../lib/api/file-api';
-import type {AttachedFile, FileResponse, HTMLInputEvent} from '../type';
+import type {AttachFile, FileResponse, HTMLInputEvent} from '../type';
+import type {MimeTypeString} from '../lib/util/mime-type';
 
 interface DndFileUploaderProps {
   accept?: string
@@ -16,11 +17,11 @@ enum UPLOAD_STATE {
 }
 const props = defineProps<DndFileUploaderProps>()
 const emits = defineEmits<{
-  (e: 'update:files', value: Array<AttachedFile>): void
+  (e: 'update:files', value: Array<AttachFile>): void
 }>()
 
 const container = ref<HTMLDivElement>()
-const attachedFiles = ref<Map<string, AttachedFile>>(new Map())
+const attachedFiles = ref<Map<string, AttachFile>>(new Map())
 const isHighlight = ref<boolean>(false)
 const currentState = ref<UPLOAD_STATE>()
 
@@ -123,7 +124,7 @@ function removeFile(name: string) {
     <ul class="file-list">
       <li v-for="[name, file] of attachedFiles" :key="name" class="file-list-item">
         <template v-if="file.attached">
-          <FileIcon :mime="file.type" /> [{{file.type}}] [{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
+          <FileIcon :mime="(file.type as MimeTypeString)" /> [{{file.type}}] [{{file.id}}] <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
           <HandleX size="18" fill="#ff4f4f" @click="removeFile(name)" />
         </template>
       </li>
