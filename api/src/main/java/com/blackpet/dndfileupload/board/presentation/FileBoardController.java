@@ -30,4 +30,11 @@ public class FileBoardController {
 
     return ResponseEntity.ok(list);
   }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<FileBoardResponse> getBoard(@PathVariable UUID id) {
+    FileBoardResponse board = fileBoardService.getBoard(id);
+
+    return ResponseEntity.ok(board);
+  }
 }

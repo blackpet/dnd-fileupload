@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,7 +46,7 @@ public class FileController {
 
     AttachFileResponse response = AttachFileResponse.builder()
             .id(attachFile.getId())
-            .originFilename(attachFile.getOriginFilename())
+            .name(attachFile.getName())
             .build();
 
     return ResponseEntity.ok(response);
@@ -64,7 +63,7 @@ public class FileController {
 
     response.setContentType(file.getContentType());
     response.setHeader("Content-disposition", "attachment; filename="
-            + new String(file.getOriginFilename().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+            + new String(file.getName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
     IOUtils.copy(inputStream, response.getOutputStream());
   }
 
@@ -91,7 +90,7 @@ public class FileController {
       Files.copy(inputStream, target);
     } catch (IOException e) {
       e.printStackTrace();
-      throw new RuntimeException(String.format(("파일 업로드가 실패했습니다. (%s)"), file.getOriginFilename()));
+      throw new RuntimeException(String.format(("파일 업로드가 실패했습니다. (%s)"), file.getName()));
     }
   }
 

@@ -2,15 +2,16 @@
 import type {MimeTypeString} from './lib/util/mime-type';
 import {bytesToSize} from './lib/util/size-converter';
 import DndFileUploader from './components/DndFileUploader.vue';
-import {onMounted, ref, watch} from 'vue';
+import {onMounted, reactive, ref, watch} from 'vue';
 import {FileBoardResponse, AttachFile, UUID} from './type';
-import {createFileBoard, getFileBoardList} from './lib/api/fileboard-api';
+import {createFileBoard, getFileBoard, getFileBoardList} from './lib/api/fileboard-api';
 import FileIcon from './components/FileIcon.vue';
 
 const title1 = ref<string>()
 const files1 = ref<Array<AttachFile>>([])
 const fileBoardList = ref<Array<FileBoardResponse>>()
 const apiPath = import.meta.env.VITE_API_PATH;
+const board = ref<FileBoardResponse>()
 
 const files2 = ref<Array<AttachFile>>([])
 
@@ -34,6 +35,20 @@ async function save() {
 
   // reload list
   loadFileBoardList();
+
+  // init form
+  title1.value = ''
+  files1.value = []
+}
+
+async function view(boardId: UUID) {
+  board.value = await getFileBoard(boardId)
+
+  // init view
+  title1.value = board.value?.title
+  // convert FileBoardAttachmentResponse to AttachFile
+  files1.value = board.value?.attachments?.map(({fileId, attachmentId, ...rest}) => ({...rest, id: fileId})) as Array<AttachFile>
+  console.log('view title, files', title1.value, files1.value)
 }
 </script>
 
@@ -55,11 +70,11 @@ async function save() {
     </div>
     <ul v-else>
       <li v-for="board in fileBoardList" :key="board.id" class="board-item">
-        {{board.title}}
+        <div @click="view(board.id)">{{ board.title }}</div>
         <ul class="board-files">
           <li v-for="att in board.attachments" :key="att.id">
-            <a :href="`${apiPath}/files/download/${att.fileId}`" :download="att.originFilename">
-              <FileIcon :mime="(att.contentType as MimeTypeString)" /> [{{att.contentType}}] [{{att.fileId}}] <strong>{{att.originFilename}}</strong> ({{bytesToSize(att.size)}})
+            <a :href="`${apiPath}/files/download/${att.fileId}`" :download="att.name">
+              <FileIcon :mime="(att.contentType as MimeTypeString)" /> [{{att.contentType}}] [{{att.fileId}}] <strong>{{att.name}}</strong> ({{bytesToSize(att.size)}})
             </a>
           </li>
         </ul>

@@ -2,7 +2,7 @@ export type UUID = string
 
 export interface AttachFileResponse {
   id: UUID
-  originFilename: string
+  name: string
   contentType?: string
   size?: number
   attached?: boolean
@@ -11,7 +11,7 @@ export interface AttachFileResponse {
 export interface FileBoardAttachmentResponse {
   attachmentId: UUID
   fileId: UUID
-  originFilename: string
+  name: string
   contentType?: string
   size?: number
   attached?: boolean
@@ -25,7 +25,7 @@ export interface FileBoardResponse {
 
 export interface AttachFile extends File {
   id?: UUID
-  originFilename: string
+  name: string
   contentType: string
   size: number
   attached: boolean

@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class AttachFileResponse {
   private UUID id;
-  private String originFilename;
+  private String name;
   private String contentType;
   private long size;
   private boolean attached;
