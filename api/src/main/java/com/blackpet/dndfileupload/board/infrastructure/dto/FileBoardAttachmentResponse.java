@@ -8,7 +8,7 @@ import java.util.UUID;
 public class FileBoardAttachmentResponse {
   private UUID attachmentId;
   private UUID fileId;
-  private String originFilename;
+  private String name;
   private String contentType;
   private long size;
   private boolean attached;

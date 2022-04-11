@@ -11,7 +11,13 @@ async function getFileBoardList(): Promise<Array<FileBoardResponse>> {
   return res.data;
 }
 
+async function getFileBoard(id: UUID): Promise<FileBoardResponse> {
+  const res = await api.get(`/fileBoards/${id}`)
+  return res.data;
+}
+
 export {
   createFileBoard,
   getFileBoardList,
+  getFileBoard,
 }

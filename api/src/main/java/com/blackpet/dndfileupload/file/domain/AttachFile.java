@@ -19,15 +19,15 @@ public class AttachFile extends BaseAuditingTimeEntity<AttachFile> {
   @Id
   private UUID id;
 
-  private String originFilename;
+  private String name;
   private String contentType;
   private long size;
   private String path;
   private boolean attached;
 
-  public AttachFile(String originFilename, String contentType, long size, Path uploadDirectory) {
+  public AttachFile(String name, String contentType, long size, Path uploadDirectory) {
     this.id = UUID.randomUUID();
-    this.originFilename = originFilename;
+    this.name = name;
     this.contentType = contentType;
     this.size = size;
     this.setPath(uploadDirectory);
@@ -47,7 +47,6 @@ public class AttachFile extends BaseAuditingTimeEntity<AttachFile> {
   }
 
   public void attach() {
-    if (this.attached) throw new RuntimeException("이미 첨부된 파일입니다. id=" + this.id);
     this.attached = true;
   }
 

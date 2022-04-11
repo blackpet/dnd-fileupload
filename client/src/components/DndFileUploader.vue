@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {HandleX} from '@icon-park/vue-next';
-import {onMounted, ref, watchEffect} from 'vue';
+import {onMounted, Ref, ref, watchEffect} from 'vue';
 import {bytesToSize} from '../lib/util/size-converter';
 import FileIcon from './FileIcon.vue';
 import {uploadFile} from '../lib/api/file-api';
@@ -28,11 +28,13 @@ const container = ref<HTMLDivElement>()
 const attachedFiles = ref<Map<string, AttachFile>>(new Map())
 const isHighlight = ref<boolean>(false)
 const currentState = ref<UPLOAD_STATE>()
-// const attachedFiles = computed(() => !props.modelValue ? new Map() : new Map(props.modelValue.map(f => [f.originFilename, f])))
 const randomId = Math.random().toString(36).substring(2, 18);
 
 watchEffect( () => {
+  console.log('watchEffect props.modelValue', props.modelValue.value)
+  // convert Array<AttachFile> to Map<string, AttachFile>
   attachedFiles.value = !props.modelValue ? new Map() : new Map(props.modelValue.map(f => [f.name, f]))
+  console.log('watchEffect attachedFiles.value', attachedFiles.value)
 })
 
 
@@ -87,7 +89,7 @@ async function addFiles(files: Array<File>) {
   responses.forEach((res: PromiseSettledResult<AttachFileResponse>) => {
     // 업로드 된 파일이면 list 에 추가하자!
     if (res.status === 'fulfilled') {
-      const file = attachedFiles.value.get(res.value.originFilename);
+      const file = attachedFiles.value.get(res.value.name);
       if (!file) return
       file.id = res.value.id
       file.attached = true

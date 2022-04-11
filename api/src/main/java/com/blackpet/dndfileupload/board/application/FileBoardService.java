@@ -38,12 +38,23 @@ public class FileBoardService {
   public List<FileBoardResponse> getList() {
     List<FileBoard> list = fileBoardRepository.findAll();
 
-    return list.stream().map(attachBoard -> {
+    return list.stream().map(board -> {
       FileBoardResponse boardResponse = new FileBoardResponse();
-      BeanUtils.copyProperties(attachBoard, boardResponse);
+      BeanUtils.copyProperties(board, boardResponse);
       // exclude non attached file
-      boardResponse.setAttachments(attachBoard.getFileBoardAttachmentResponseList());
+      boardResponse.setAttachments(board.getFileBoardAttachmentResponseList());
       return boardResponse;
     }).collect(Collectors.toList());
+  }
+
+  public FileBoardResponse getBoard(UUID id) {
+    FileBoard board = fileBoardRepository.findById(id).orElseThrow(RuntimeException::new);
+
+    FileBoardResponse boardResponse = new FileBoardResponse();
+    BeanUtils.copyProperties(board, boardResponse);
+    // exclude non attached file
+    boardResponse.setAttachments(board.getFileBoardAttachmentResponseList());
+
+    return boardResponse;
   }
 }
