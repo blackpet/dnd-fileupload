@@ -1,4 +1,4 @@
-import type {AttachFileResponse} from '../../type';
+import type {AttachFile, AttachFileResponse, UUID} from '../../type';
 import {api} from '../http/http-helper';
 
 async function uploadFile(file: File): Promise<AttachFileResponse> {
@@ -14,6 +14,18 @@ async function uploadFile(file: File): Promise<AttachFileResponse> {
   }
 }
 
+async function deleteFile(id: UUID | undefined): Promise<boolean> {
+  if (!id) return false
+
+  try {
+    await api.delete(`/files/${id}`)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 export {
   uploadFile,
+  deleteFile,
 }

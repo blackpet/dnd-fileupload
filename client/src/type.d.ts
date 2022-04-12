@@ -29,6 +29,8 @@ export interface AttachFile extends File {
   contentType: string
   size: number
   attached: boolean
+  tobeDeleted?: boolean // 삭제 예정 파일 여부
+  temped?: boolean // 임시 첨부 여부
 }
 
 export interface CreateFileBoardRequest {
