@@ -38,6 +38,16 @@ export interface CreateFileBoardRequest {
   fileIds: Array<UUID>
 }
 
+export interface ModifyFileBoardRequest {
+  id: UUID
+  title: string
+  attachments: Array<{
+    fileId: UUID
+    tobeDeleted?: boolean
+    temped?: boolean
+  }>
+}
+
 export interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
 }

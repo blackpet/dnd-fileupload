@@ -1,10 +1,12 @@
 package com.blackpet.dndfileupload.board.domain;
 
 import com.blackpet.dndfileupload.board.infrastructure.dto.FileBoardAttachmentResponse;
+import com.blackpet.dndfileupload.board.infrastructure.dto.ModifyFileBoardAttachmentRequest;
 import com.blackpet.dndfileupload.common.entity.BaseAuditingTimeEntity;
 import com.blackpet.dndfileupload.file.domain.AttachFile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
@@ -20,9 +22,10 @@ public class FileBoard extends BaseAuditingTimeEntity<FileBoard> {
   @Id
   @GeneratedValue(generator = "uuid")
   private UUID id;
+  @Setter
   private String title;
 
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "fileBoard", cascade = CascadeType.ALL)
+  @OneToMany(fetch = FetchType.EAGER, mappedBy = "fileBoard", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<FileBoardAttachment> attachments = new ArrayList<>();
 
   public FileBoard(String title) {
@@ -53,5 +56,9 @@ public class FileBoard extends BaseAuditingTimeEntity<FileBoard> {
               return res;
             })
             .collect(Collectors.toList());
+  }
+
+  public void truncateAllAttachments() {
+    this.attachments.clear();
   }
 }
