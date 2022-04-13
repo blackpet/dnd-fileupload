@@ -3,7 +3,7 @@ import {HandleX} from '@icon-park/vue-next';
 import {onMounted, Ref, ref, watchEffect} from 'vue';
 import {bytesToSize} from '../lib/util/size-converter';
 import FileIcon from './FileIcon.vue';
-import {uploadFile} from '../lib/api/file-api';
+import {deleteFile, uploadFile} from '../lib/api/file-api';
 import type {AttachFile, AttachFileResponse, HTMLInputEvent} from '../type';
 import type {MimeTypeString} from '../lib/util/mime-type';
 
@@ -93,6 +93,8 @@ async function addFiles(files: Array<File>) {
       if (!file) return
       file.id = res.value.id
       file.attached = true
+      // 임시 첨부 flag!
+      file.temped = true
     }
   })
 
@@ -111,7 +113,17 @@ async function addFiles(files: Array<File>) {
 }
 
 function removeFile(name: string) {
-  attachedFiles.value.delete(name)
+  // 임시 첨부면 즉시 삭제! / 기 첨부된 파일이면 tobeDeleted=true
+  const file = attachedFiles.value.get(name)
+  if (!file) throw new Error('Illegal Argument Exception')
+
+  console.log('removeFile', name, file)
+  if (!file.temped) {
+    file.tobeDeleted = true
+  } else {
+    deleteFile(file.id)
+    attachedFiles.value.delete(name)
+  }
 
   // emit
   emits('update:modelValue', [...attachedFiles.value.values()])
@@ -135,10 +147,10 @@ function removeFile(name: string) {
 
     <ul class="file-list">
       <li v-for="[name, file] of attachedFiles" :key="name" class="file-list-item">
-        <template v-if="file.attached">
+        <div v-if="file.attached" :class="{tobeDeleted: file.tobeDeleted}">
           <FileIcon :mime="(file.type as MimeTypeString)" /> <strong>{{name}}</strong> ({{bytesToSize(file.size)}})
-          <HandleX size="18" fill="#ff4f4f" @click="removeFile(name)" />
-        </template>
+          <HandleX v-if="!file.tobeDeleted" size="18" fill="#ff4f4f" @click="removeFile(name)" />
+        </div>
       </li>
     </ul>
 
@@ -150,6 +162,7 @@ function removeFile(name: string) {
 </template>
 
 <style scoped>
+.tobeDeleted {text-decoration: line-through; color: #a2a2a2;}
 .file-list-item {
   display: flex;
   align-items: center;
